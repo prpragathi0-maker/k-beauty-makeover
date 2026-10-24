@@ -1,0 +1,386 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seoul Glow Studio</title>
+<style>
+:root {
+  --pink:#ef8fae; --cream:#fff8f3; --ink:#493540;
+  --soft:#f9e6eb; --gold:#c89c58;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; font-family: "Trebuchet MS",Arial,sans-serif;
+  background:var(--cream); color:var(--ink);
+}
+button { font:inherit; cursor:pointer; }
+header {
+  text-align:center; padding:25px 12px 17px;
+  background:linear-gradient(135deg,#ffe7ed,#fff8f0,#f9e5d9);
+  border-bottom:1px solid #f1d8dd;
+}
+.logo { font-size:12px; letter-spacing:4px; color:#b46e86; }
+h1 { font-family:Georgia,serif; font-weight:normal;
+  font-size:clamp(28px,6vw,43px); margin:8px 0; }
+header p { font-size:13px; margin:0; color:#886c79; }
+.stats {
+  display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
+  padding:13px;
+}
+.stat {
+  background:white; border:1px solid #f0dce2; border-radius:30px;
+  padding:9px 15px; font-size:13px; box-shadow:0 3px 12px #7740500a;
+}
+main { max-width:1050px; margin:auto; padding:10px 15px 35px; }
+.game {
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:20px; align-items:start;
+}
+.panel {
+  background:white; border:1px solid #f0dce2; border-radius:22px;
+  padding:16px; box-shadow:0 8px 30px #7442520a;
+}
+.panel-title { font-family:Georgia,serif; font-size:21px; margin:0 0 12px; }
+.client {
+  background:#fff0f4; padding:13px; border-radius:15px;
+  display:flex; gap:12px; align-items:center; margin-bottom:12px;
+}
+.client-icon { font-size:32px; background:white; padding:10px; border-radius:14px; }
+.client h3 { margin:0 0 5px; font-size:15px; }
+.client p { margin:0; font-size:12px; line-height:1.5; color:#806774; }
+#mission { font-weight:bold; color:#a64e72; }
+.stage {
+  min-height:365px; border-radius:20px; position:relative; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(ellipse at 50% 35%,#fffdfb 0%,#fbe5ed 55%,#f3d5e0 100%);
+}
+.stage:before,.stage:after {
+  content:"✦"; position:absolute; color:#dca6b8; font-size:22px;
+}
+.stage:before { top:25px; left:22px; }
+.stage:after { right:25px; top:65px; font-size:17px; }
+.character { width:100%; max-width:340px; height:auto; position:relative; z-index:1; }
+.stage-label {
+  position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+  background:#ffffffd9; border-radius:20px; padding:7px 14px;
+  font-size:11px; white-space:nowrap; letter-spacing:1px;
+}
+.progress { margin-top:13px; font-size:12px; color:#806774; }
+.track { height:7px; background:#f4e5e9; border-radius:10px; margin-top:7px; overflow:hidden; }
+#bar { height:100%; width:0%; background:linear-gradient(90deg,#e78aaa,#bd7190); transition:.3s; }
+.section-title { font-size:12px; letter-spacing:1.5px; color:#a56d82;
+  margin:17px 0 9px; font-weight:bold; text-transform:uppercase; }
+.choices { display:flex; flex-wrap:wrap; gap:8px; }
+.choice {
+  border:1px solid #eedde2; border-radius:12px; background:#fffaf9;
+  color:#634b57; padding:9px 10px; font-size:12px;
+  transition:.18s;
+}
+.choice:hover { transform:translateY(-2px); border-color:var(--pink); }
+.choice.active { border:2px solid #df84a2; background:#fff0f4; padding:8px 9px; }
+.swatch {
+  width:26px; height:26px; border-radius:50%; display:inline-block;
+  border:2px solid white; outline:1px solid #e8d6dc; vertical-align:middle;
+}
+.swatch-btn { padding:6px; display:flex; align-items:center; gap:7px; }
+.actions { display:flex; gap:9px; margin-top:20px; flex-wrap:wrap; }
+.primary,.secondary {
+  border:0; border-radius:12px; padding:12px 15px; font-weight:bold; font-size:13px;
+}
+.primary { background:#d97899; color:white; flex:1; }
+.primary:hover { background:#c76789; }
+.secondary { background:#f8edf0; color:#795666; }
+.result {
+  display:none; margin-top:13px; background:#fff4df;
+  border:1px solid #f0dfb9; border-radius:14px; padding:13px;
+  font-size:13px; line-height:1.6;
+}
+footer { text-align:center; padding:0 10px 25px; color:#a58a96; font-size:11px; }
+@media(max-width:680px) {
+  main { padding:8px 11px 25px; }
+  .game { grid-template-columns:1fr; gap:14px; }
+  .panel { padding:13px; }
+  .stage { min-height:330px; }
+  .character { max-width:310px; }
+  .stats { gap:7px; padding:10px; }
+  .stat { padding:8px 11px; font-size:12px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">SEOUL BEAUTY CLUB</div>
+  <h1>Seoul Glow Studio</h1>
+  <p>Your little Korean beauty makeover world ♡</p>
+</header>
+
+<div class="stats">
+  <div class="stat">⭐ Stars: <b id="stars">0</b></div>
+  <div class="stat">🪙 Coins: <b id="coins">0</b></div>
+  <div class="stat">💗 Client: <b id="level">1 / 5</b></div>
+</div>
+
+<main>
+<div class="game">
+<section class="panel">
+  <h2 class="panel-title">Your Beauty Canvas</h2>
+  <div class="client">
+    <div class="client-icon" id="clientEmoji">🌸</div>
+    <div>
+      <h3 id="clientName">The Soft Girl</h3>
+      <p id="clientDesc">Dreamy, rosy and romantic.</p>
+      <p>Her request: <span id="mission">Pink lips</span></p>
+    </div>
+  </div>
+
+  <div class="stage">
+    <svg class="character" id="character" viewBox="0 0 320 390" role="img" aria-label="Illustrated makeup character">
+      <defs>
+        <linearGradient id="skin" x1="0" x2="1">
+          <stop offset="0" stop-color="#e9b99f"/>
+          <stop offset=".5" stop-color="#ffddc6"/>
+          <stop offset="1" stop-color="#e9b99f"/>
+        </linearGradient>
+        <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#55313c"/>
+          <stop offset="1" stop-color="#251b2a"/>
+        </linearGradient>
+      </defs>
+      <!-- backdrop details -->
+      <circle cx="160" cy="185" r="126" fill="#ffffff" opacity=".45"/>
+      <!-- body and outfit -->
+      <path id="outfit" d="M70 390 Q76 315 118 302 L139 288 L181 288 L202 302 Q244 315 250 390Z" fill="#e9a8bf"/>
+      <path d="M135 295 L160 329 L185 295 L179 285 L141 285Z" fill="#fff1e9"/>
+      <path d="M120 308 L105 390 M200 308 L215 390" stroke="#ffffff" stroke-opacity=".35" stroke-width="3"/>
+      <!-- neck -->
+      <path d="M139 257 L139 303 Q160 325 181 303 L181 257Z" fill="url(#skin)"/>
+      <!-- hair behind -->
+      <path id="backHair" d="M82 143 Q75 43 160 38 Q245 43 238 143 L250 279 Q220 315 211 257 L105 257 Q99 310 70 278Z" fill="url(#hair)"/>
+      <!-- ears -->
+      <ellipse cx="100" cy="180" rx="14" ry="22" fill="#f0c2a8"/>
+      <ellipse cx="220" cy="180" rx="14" ry="22" fill="#f0c2a8"/>
+      <!-- face -->
+      <path d="M100 125 Q103 72 160 70 Q217 72 220 125 L212 209 Q203 254 160 267 Q117 254 108 209Z" fill="url(#skin)"/>
+      <!-- hair fringe -->
+      <path id="fringe" d="M95 150 Q85 67 145 66 Q191 48 222 113 L218 149 Q198 119 183 101 Q155 134 105 132Z" fill="url(#hair)"/>
+      <!-- brows -->
+      <path d="M119 151 Q135 140 148 151" fill="none" stroke="#51333b" stroke-width="4" stroke-linecap="round"/>
+      <path d="M172 151 Q187 140 201 151" fill="none" stroke="#51333b" stroke-width="4" stroke-linecap="round"/>
+      <!-- eyes -->
+      <path d="M116 169 Q133 151 151 169 Q133 184 116 169Z" fill="white"/>
+      <path d="M169 169 Q187 151 204 169 Q187 184 169 169Z" fill="white"/>
+      <ellipse cx="134" cy="169" rx="7" ry="9" fill="#51323d"/>
+      <ellipse cx="186" cy="169" rx="7" ry="9" fill="#51323d"/>
+      <circle cx="136" cy="166" r="2.5" fill="white"/>
+      <circle cx="188" cy="166" r="2.5" fill="white"/>
+      <g id="eyeliner" stroke="#402633" stroke-width="2.5" stroke-linecap="round" fill="none">
+        <path d="M116 167 Q132 150 151 168"/>
+        <path d="M169 168 Q188 150 204 167"/>
+      </g>
+      <!-- eyeshadow -->
+      <path id="shadow" d="M116 161 Q134 144 151 161 L148 167 Q133 157 119 166Z M169 161 Q188 144 204 161 L201 166 Q185 157 172 167Z" fill="#e8a5b8" opacity=".85"/>
+      <!-- blush -->
+      <ellipse id="blushL" cx="119" cy="202" rx="19" ry="10" fill="#ed9cae" opacity=".65"/>
+      <ellipse id="blushR" cx="201" cy="202" rx="19" ry="10" fill="#ed9cae" opacity=".65"/>
+      <!-- nose -->
+      <path d="M159 174 Q153 194 158 197 Q163 200 167 195" fill="none" stroke="#d59b83" stroke-width="2" stroke-linecap="round"/>
+      <!-- lips -->
+      <path id="lips" d="M143 220 Q151 211 160 217 Q169 211 177 220 Q169 234 160 232 Q150 234 143 220Z" fill="#df718f"/>
+      <path d="M147 220 Q160 225 173 220" fill="none" stroke="#b94f70" stroke-width="1.5"/>
+      <!-- hair highlights -->
+      <path d="M104 91 Q90 144 103 216 M213 102 Q231 161 216 232" fill="none" stroke="#b47c89" stroke-width="3" opacity=".4"/>
+      <!-- accessories -->
+      <circle cx="100" cy="204" r="5" fill="#e8bd72"/>
+      <circle cx="220" cy="204" r="5" fill="#e8bd72"/>
+      <path d="M137 300 Q160 310 183 300" fill="none" stroke="#d39aab" stroke-width="2"/>
+    </svg>
+    <div class="stage-label">✦ YOUR MAKEOVER ✦</div>
+  </div>
+
+  <div class="progress">
+    <div style="display:flex;justify-content:space-between">
+      <span>Makeover progress</span><b id="progressText">0%</b>
+    </div>
+    <div class="track"><div id="bar"></div></div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2 class="panel-title">Beauty Menu</h2>
+  <p style="font-size:12px;color:#947985;margin-top:-5px">Choose your favourite look and make her glow!</p>
+
+  <div class="section-title">💋 Lip colour</div>
+  <div class="choices" id="lipsChoices">
+    <button class="choice swatch-btn active" data-group="lips" data-value="#df718f"><span class="swatch" style="background:#df718f"></span>Rose</button>
+    <button class="choice swatch-btn" data-group="lips" data-value="#b84965"><span class="swatch" style="background:#b84965"></span>Berry</button>
+    <button class="choice swatch-btn" data-group="lips" data-value="#ed9eaa"><span class="swatch" style="background:#ed9eaa"></span>Peach</button>
+    <button class="choice swatch-btn" data-group="lips" data-value="#9d465c"><span class="swatch" style="background:#9d465c"></span>Cherry</button>
+    <button class="choice swatch-btn" data-group="lips" data-value="#c77caa"><span class="swatch" style="background:#c77caa"></span>Mauve</button>
+  </div>
+
+  <div class="section-title">👁 Eyeshadow</div>
+  <div class="choices">
+    <button class="choice active" data-group="shadow" data-value="#e8a5b8">Rosy</button>
+    <button class="choice" data-group="shadow" data-value="#c6a6df">Lavender</button>
+    <button class="choice" data-group="shadow" data-value="#d8b889">Champagne</button>
+    <button class="choice" data-group="shadow" data-value="#b8c9b2">Sage</button>
+    <button class="choice" data-group="shadow" data-value="#e99b76">Coral</button>
+  </div>
+
+  <div class="section-title">🌷 Blush</div>
+  <div class="choices">
+    <button class="choice active" data-group="blush" data-value="#ed9cae">Baby pink</button>
+    <button class="choice" data-group="blush" data-value="#edab84">Peach</button>
+    <button class="choice" data-group="blush" data-value="#d97c91">Rose</button>
+    <button class="choice" data-group="blush" data-value="#c98bb9">Lilac</button>
+    <button class="choice" data-group="blush" data-value="#e5b5a1">Soft nude</button>
+  </div>
+
+  <div class="section-title">✨ Eyeliner</div>
+  <div class="choices">
+    <button class="choice active" data-group="liner" data-value="2.5">Classic</button>
+    <button class="choice" data-group="liner" data-value="4">Bold wing</button>
+    <button class="choice" data-group="liner" data-value="1">Natural</button>
+  </div>
+
+  <div class="section-title">💇 Hairstyle</div>
+  <div class="choices">
+    <button class="choice active" data-group="hair" data-value="long">Long waves</button>
+    <button class="choice" data-group="hair" data-value="bob">Cute bob</button>
+    <button class="choice" data-group="hair" data-value="bun">Elegant bun</button>
+  </div>
+
+  <div class="section-title">🎀 Outfit</div>
+  <div class="choices">
+    <button class="choice active" data-group="outfit" data-value="#e9a8bf">Pink</button>
+    <button class="choice" data-group="outfit" data-value="#b5a4d9">Lavender</button>
+    <button class="choice" data-group="outfit" data-value="#a9c9b6">Mint</button>
+    <button class="choice" data-group="outfit" data-value="#e8c58d">Cream</button>
+    <button class="choice" data-group="outfit" data-value="#8d9fc9">Blue</button>
+  </div>
+
+  <div class="actions">
+    <button class="primary" id="finish">Finish Makeover ✨</button>
+    <button class="secondary" id="next">Next Client →</button>
+  </div>
+  <div class="actions">
+    <button class="secondary" id="random">🎲 Surprise Me</button>
+    <button class="secondary" id="reset">↻ Reset Look</button>
+  </div>
+  <div class="result" id="result" aria-live="polite"></div>
+</section>
+</div>
+</main>
+<footer>SEOUL GLOW STUDIO · A little creativity, a little sparkle ♡</footer>
+
+<script>
+const defaults = {
+  lips:"#df718f", shadow:"#e8a5b8", blush:"#ed9cae",
+  liner:"2.5", hair:"long", outfit:"#e9a8bf"
+};
+let look = {...defaults};
+let stars = 0, coins = 0, clientIndex = 0;
+let completed = [];
+const clients = [
+  {name:"The Soft Girl",emoji:"🌸",desc:"Dreamy, rosy and romantic.",request:"Pink lips",target:{lips:"#df718f",shadow:"#e8a5b8",blush:"#ed9cae",hair:"long",outfit:"#e9a8bf"}},
+  {name:"Lavender Dream",emoji:"🪻",desc:"A dreamy purple princess look.",request:"Lavender eyes",target:{lips:"#c77caa",shadow:"#c6a6df",blush:"#c98bb9",hair:"bun",outfit:"#b5a4d9"}},
+  {name:"Peach Picnic",emoji:"🍑",desc:"Fresh, warm and sunshine-soft.",request:"Peachy makeup",target:{lips:"#ed9eaa",shadow:"#e99b76",blush:"#edab84",hair:"bob",outfit:"#e8c58d"}},
+  {name:"Mint Muse",emoji:"🍃",desc:"A fresh and elegant style.",request:"Mint outfit",target:{lips:"#b84965",shadow:"#b8c9b2",blush:"#e5b5a1",hair:"long",outfit:"#a9c9b6"}},
+  {name:"Blue Hour",emoji:"🌙",desc:"A cool, chic evening look.",request:"Blue outfit",target:{lips:"#9d465c",shadow:"#c6a6df",blush:"#d97c91",hair:"bun",outfit:"#8d9fc9"}}
+];
+
+function applyLook() {
+  document.getElementById("lips").setAttribute("fill",look.lips);
+  document.getElementById("shadow").setAttribute("fill",look.shadow);
+  document.getElementById("blushL").setAttribute("fill",look.blush);
+  document.getElementById("blushR").setAttribute("fill",look.blush);
+  document.getElementById("outfit").setAttribute("fill",look.outfit);
+  const eyeliner = document.getElementById("eyeliner");
+  eyeliner.setAttribute("stroke-width",look.liner);
+  const back = document.getElementById("backHair");
+  const fringe = document.getElementById("fringe");
+  if (look.hair === "bob") {
+    back.setAttribute("d","M82 143 Q75 43 160 38 Q245 43 238 143 L230 218 Q215 248 201 225 L119 225 Q105 248 90 218Z");
+    fringe.setAttribute("d","M95 150 Q85 67 145 66 Q191 48 222 113 L218 149 Q198 119 183 101 Q155 134 105 132Z");
+  } else if (look.hair === "bun") {
+    back.setAttribute("d","M82 143 Q75 43 160 38 Q245 43 238 143 L230 235 Q215 265 201 225 L119 225 Q105 265 90 235Z");
+    fringe.setAttribute("d","M95 150 Q85 67 145 66 Q191 48 222 113 L218 149 Q198 119 183 101 Q155 134 105 132Z");
+  } else {
+    back.setAttribute("d","M82 143 Q75 43 160 38 Q245 43 238 143 L250 279 Q220 315 211 257 L105 257 Q99 310 70 278Z");
+    fringe.setAttribute("d","M95 150 Q85 67 145 66 Q191 48 222 113 L218 149 Q198 119 183 101 Q155 134 105 132Z");
+  }
+  document.querySelectorAll("[data-group]").forEach(btn => {
+    btn.classList.toggle("active", look[btn.dataset.group] === btn.dataset.value);
+  });
+  updateProgress();
+}
+function updateProgress() {
+  const keys = Object.keys(defaults);
+  const changed = keys.filter(k => look[k] !== defaults[k]).length;
+  const pct = Math.round(changed / keys.length * 100);
+  document.getElementById("bar").style.width = pct + "%";
+  document.getElementById("progressText").textContent = pct + "%";
+}
+function showClient() {
+  const c = clients[clientIndex];
+  document.getElementById("clientName").textContent = c.name;
+  document.getElementById("clientEmoji").textContent = c.emoji;
+  document.getElementById("clientDesc").textContent = c.desc;
+  document.getElementById("mission").textContent = c.request;
+  document.getElementById("level").textContent = (clientIndex+1) + " / " + clients.length;
+  document.getElementById("result").style.display = "none";
+}
+document.querySelectorAll("[data-group]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    look[btn.dataset.group] = btn.dataset.value;
+    applyLook();
+  });
+});
+document.getElementById("finish").addEventListener("click", () => {
+  if (completed.includes(clientIndex)) {
+    const r = document.getElementById("result");
+    r.style.display = "block";
+    r.innerHTML = "You already completed this client! 💖 Try the next client for more rewards.";
+    return;
+  }
+  const target = clients[clientIndex].target;
+  let matched = 0;
+  Object.keys(target).forEach(k => { if (look[k] === target[k]) matched++; });
+  const score = Math.round(matched / Object.keys(target).length * 100);
+  const earned = score >= 80 ? 3 : score >= 50 ? 2 : 1;
+  stars += earned;
+  coins += earned * 10;
+  completed.push(clientIndex);
+  document.getElementById("stars").textContent = stars;
+  document.getElementById("coins").textContent = coins;
+  const r = document.getElementById("result");
+  r.style.display = "block";
+  r.innerHTML = `<b>${score >= 80 ? "✨ Perfect glow!" : score >= 50 ? "💗 Lovely makeover!" : "🌷 Cute start!"}</b><br>Client match: ${score}%<br>You earned ${earned} ⭐ stars and ${earned*10} 🪙 coins!`;
+});
+document.getElementById("next").addEventListener("click", () => {
+  clientIndex = (clientIndex + 1) % clients.length;
+  look = {...defaults};
+  applyLook();
+  showClient();
+});
+document.getElementById("reset").addEventListener("click", () => {
+  look = {...defaults}; applyLook();
+  document.getElementById("result").style.display = "none";
+});
+document.getElementById("random").addEventListener("click", () => {
+  const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+  look.lips = pick(["#df718f","#b84965","#ed9eaa","#9d465c","#c77caa"]);
+  look.shadow = pick(["#e8a5b8","#c6a6df","#d8b889","#b8c9b2","#e99b76"]);
+  look.blush = pick(["#ed9cae","#edab84","#d97c91","#c98bb9","#e5b5a1"]);
+  look.liner = pick(["1","2.5","4"]);
+  look.hair = pick(["long","bob","bun"]);
+  look.outfit = pick(["#e9a8bf","#b5a4d9","#a9c9b6","#e8c58d","#8d9fc9"]);
+  applyLook();
+});
+applyLook();
+showClient();
+</script>
+</body>
+</html>
